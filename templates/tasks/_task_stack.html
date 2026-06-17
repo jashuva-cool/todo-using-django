@@ -1,0 +1,14 @@
+<div class="task-stack">
+  {% for task in tasks %}
+    <a class="task-row" href="{{ task.get_absolute_url }}">
+      <span class="status-dot {% if task.completed %}done{% elif task.is_overdue %}overdue{% endif %}"></span>
+      <span class="flex-grow-1">
+        <span class="d-block fw-semibold">{{ task.title }}</span>
+        <span class="small text-muted">{{ task.due_datetime|date:"M d, Y H:i" }}{% if task.category %} · {{ task.category.name }}{% endif %}</span>
+      </span>
+      <span class="badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+    </a>
+  {% empty %}
+    <div class="empty-state">No tasks here yet.</div>
+  {% endfor %}
+</div>

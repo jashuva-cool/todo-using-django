@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: taskflow
+    env: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn taskflow.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: taskflow.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://taskflow.onrender.com

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Profile | TaskFlow{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="glass-card p-4 text-center">
+      {% if user.profile.avatar %}<img class="profile-avatar" src="{{ user.profile.avatar.url }}" alt="Avatar">{% else %}<div class="profile-avatar placeholder-avatar"><i class="bi bi-person"></i></div>{% endif %}
+      <h1 class="h4 mt-3">{{ user.get_full_name|default:user.username }}</h1>
+      <p class="text-muted">{{ user.email }}</p>
+      <a class="btn btn-primary" href="{% url 'edit_profile' %}">Edit Profile</a>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="glass-card p-4">
+      <h2 class="h5">Bio</h2>
+      <p class="mb-0">{{ user.profile.bio|default:"No bio added yet." }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

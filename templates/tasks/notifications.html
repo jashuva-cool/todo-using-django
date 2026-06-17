@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Notifications | TaskFlow{% endblock %}
+{% block content %}
+<div class="glass-card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 fw-bold mb-0">Notifications</h1>
+    <form method="post">{% csrf_token %}<button class="btn btn-outline-primary"><i class="bi bi-check2-all"></i> Mark read</button></form>
+  </div>
+  <div class="list-group list-group-flush">
+    {% for notification in notifications %}
+      <div class="list-group-item bg-transparent d-flex justify-content-between gap-3">
+        <div><span class="{% if not notification.is_read %}fw-semibold{% endif %}">{{ notification.message }}</span><div class="small text-muted">{{ notification.created_at|date:"M d, Y H:i" }}</div></div>
+        {% if not notification.is_read %}<span class="badge bg-primary align-self-start">New</span>{% endif %}
+      </div>
+    {% empty %}
+      <div class="empty-state">No notifications yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
