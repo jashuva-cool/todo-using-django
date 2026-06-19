@@ -3,21 +3,16 @@ import csv
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import CategoryForm, TaskForm
 from .models import Category, Notification, Task
-
-
-def task_queryset(user):
-    return Task.objects.filter(user=user).select_related("category")
+from .services import create_task_reminders, send_pending_task_reminder_email, task_queryset
 
 
 @login_required
@@ -34,7 +29,7 @@ def dashboard(request):
         "upcoming_tasks": pending_tasks.filter(due_datetime__gte=now).order_by("due_datetime")[:6],
         "overdue_list": pending_tasks.filter(due_datetime__lt=now).order_by("due_datetime")[:6],
     }
-    create_due_notifications(request.user)
+    create_task_reminders(request.user)
     return render(request, "tasks/dashboard.html", context)
 
 
@@ -91,7 +86,7 @@ def task_create(request):
     form = TaskForm(request.POST or None, user=request.user)
     if request.method == "POST" and form.is_valid():
         task = form.save()
-        maybe_send_reminder_email(task)
+        send_pending_task_reminder_email(task)
         messages.success(request, "Task created successfully.")
         return redirect(task)
     return render(request, "tasks/task_form.html", {"form": form, "title": "Create Task"})
@@ -103,7 +98,7 @@ def task_update(request, pk):
     form = TaskForm(request.POST or None, user=request.user, instance=task)
     if request.method == "POST" and form.is_valid():
         task = form.save()
-        maybe_send_reminder_email(task)
+        send_pending_task_reminder_email(task)
         messages.success(request, "Task updated successfully.")
         return redirect(task)
     return render(request, "tasks/task_form.html", {"form": form, "title": "Edit Task"})
@@ -128,6 +123,9 @@ def toggle_task(request, pk):
     task.save()
     if task.completed:
         Notification.objects.get_or_create(user=request.user, task=task, message=f"Task completed: {task.title}")
+    else:
+        Notification.objects.get_or_create(user=request.user, task=task, message=f"Task pending: {task.title}")
+        create_task_reminders(request.user)
     return JsonResponse({"ok": True, "completed": task.completed, "status": task.get_status_display()})
 
 
@@ -234,23 +232,3 @@ def export_tasks_csv(request):
             task.created_at,
         ])
     return response
-
-
-def create_due_notifications(user):
-    now = timezone.now()
-    soon = now + timezone.timedelta(hours=24)
-    for task in task_queryset(user).filter(completed=False, due_datetime__range=(now, soon)):
-        Notification.objects.get_or_create(user=user, task=task, message=f"Reminder: {task.title} is due soon.")
-    for task in task_queryset(user).filter(completed=False, due_datetime__lt=now):
-        Notification.objects.get_or_create(user=user, task=task, message=f"Overdue: {task.title} needs attention.")
-
-
-def maybe_send_reminder_email(task):
-    if task.user.email:
-        send_mail(
-            subject=f"TaskFlow reminder: {task.title}",
-            message=f"Your task is scheduled for {timezone.localtime(task.due_datetime):%Y-%m-%d %H:%M}.",
-            from_email=None,
-            recipient_list=[task.user.email],
-            fail_silently=True,
-        )

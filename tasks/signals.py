@@ -10,3 +10,5 @@ def create_task_notification(sender, instance, created, **kwargs):
         Notification.objects.create(user=instance.user, task=instance, message=f"Task created: {instance.title}")
     elif instance.completed:
         Notification.objects.get_or_create(user=instance.user, task=instance, message=f"Task completed: {instance.title}")
+    else:
+        Notification.objects.get_or_create(user=instance.user, task=instance, message=f"Task pending: {instance.title}")

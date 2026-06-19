@@ -31,5 +31,16 @@ class UserUpdateForm(forms.ModelForm):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ["avatar", "bio"]
-        widgets = {"bio": forms.Textarea(attrs={"rows": 4})}
+        fields = [
+            "avatar",
+            "bio",
+            "telegram_chat_id",
+            "enable_telegram_reminders",
+            "whatsapp_number",
+            "enable_whatsapp_reminders",
+        ]
+        widgets = {
+            "bio": forms.Textarea(attrs={"rows": 4}),
+            "telegram_chat_id": forms.TextInput(attrs={"placeholder": "Example: 123456789"}),
+            "whatsapp_number": forms.TextInput(attrs={"placeholder": "Example: +919876543210"}),
+        }

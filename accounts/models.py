@@ -14,6 +14,18 @@ class Profile(models.Model):
         validators=[FileExtensionValidator(["jpg", "jpeg", "png", "gif", "webp"])],
     )
     bio = models.TextField(blank=True)
+    telegram_chat_id = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Telegram chat ID for reminder messages.",
+    )
+    whatsapp_number = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="WhatsApp number with country code, for example +919876543210.",
+    )
+    enable_telegram_reminders = models.BooleanField(default=False)
+    enable_whatsapp_reminders = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username} profile"

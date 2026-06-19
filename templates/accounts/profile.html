@@ -15,6 +15,13 @@
       <h2 class="h5">Bio</h2>
       <p class="mb-0">{{ user.profile.bio|default:"No bio added yet." }}</p>
     </div>
+    <div class="glass-card p-4 mt-4">
+      <h2 class="h5">Reminder Channels</h2>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="badge {% if user.profile.enable_telegram_reminders %}text-bg-primary{% else %}text-bg-secondary{% endif %}">Telegram {% if user.profile.enable_telegram_reminders %}On{% else %}Off{% endif %}</span>
+        <span class="badge {% if user.profile.enable_whatsapp_reminders %}text-bg-success{% else %}text-bg-secondary{% endif %}">WhatsApp {% if user.profile.enable_whatsapp_reminders %}On{% else %}Off{% endif %}</span>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

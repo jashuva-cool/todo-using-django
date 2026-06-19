@@ -36,6 +36,10 @@ Open `http://127.0.0.1:8000/`.
    - `SECRET_KEY=<generate a secure value>`
    - `ALLOWED_HOSTS=<your-render-domain>`
    - `CSRF_TRUSTED_ORIGINS=https://<your-render-domain>`
+   - `TELEGRAM_BOT_TOKEN=<your Telegram bot token>`
+   - `TWILIO_ACCOUNT_SID=<your Twilio account sid>`
+   - `TWILIO_AUTH_TOKEN=<your Twilio auth token>`
+   - `TWILIO_WHATSAPP_FROM=+14155238886` or your approved WhatsApp sender
 
 The included `render.yaml` can also be used as a Render blueprint.
 
@@ -48,6 +52,8 @@ The included `render.yaml` can also be used as a Render blueprint.
 - Recent tasks, upcoming tasks, overdue tasks
 - Search, category filter, priority filter, status filter, due date sorting
 - Notification model, notification bell, unread count, due and overdue task alerts
+- Pending-task reminders across the app, plus `python manage.py send_task_reminders --email --external` for scheduled reminder jobs
+- Telegram and WhatsApp reminder delivery from each user's profile settings
 - Monthly calendar, tasks by date, upcoming and overdue lists
 - CSV export
 - Pagination
@@ -57,5 +63,7 @@ The included `render.yaml` can also be used as a Render blueprint.
 ## Notes
 
 The default email backend prints password reset and reminder emails to the console for local development. Replace the email settings in `taskflow/settings.py` when deploying.
+
+Telegram reminders require a bot token from BotFather and the user's Telegram chat ID. WhatsApp reminders require a Twilio WhatsApp sender and account credentials. Store all credentials as environment variables, never in source code.
 
 For production, move secrets into environment variables, set `DEBUG = False`, configure `ALLOWED_HOSTS`, use a production database, configure static/media hosting, and enable HTTPS security settings.
