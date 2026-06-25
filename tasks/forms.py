@@ -18,15 +18,15 @@ class TaskForm(BootstrapFormMixin, forms.ModelForm):
     due_time = forms.TimeField(widget=forms.TimeInput(attrs={"type": "time"}))
     custom_category = forms.CharField(
         required=False,
-        label="Custom category",
+        label="Category",
         max_length=80,
-        help_text="Type a new category name if you do not want to use an existing one.",
+        help_text="Type the category name you want for this task.",
         widget=forms.TextInput(attrs={"placeholder": "Example: College, Office, Personal"}),
     )
 
     class Meta:
         model = Task
-        fields = ["title", "description", "priority", "category", "custom_category", "due_date", "due_time", "completed"]
+        fields = ["title", "description", "priority", "custom_category", "due_date", "due_time", "completed"]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
         }
@@ -34,13 +34,11 @@ class TaskForm(BootstrapFormMixin, forms.ModelForm):
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
-        if user:
-            self.fields["category"].queryset = Category.objects.filter(user=user)
-        self.fields["category"].required = False
-        self.fields["category"].empty_label = "Choose a category"
         if self.instance and self.instance.pk:
             self.fields["due_date"].initial = self.instance.due_datetime.date()
             self.fields["due_time"].initial = self.instance.due_datetime.strftime("%H:%M")
+            if self.instance.category:
+                self.fields["custom_category"].initial = self.instance.category.name
         self.apply_bootstrap()
 
     def clean(self):
@@ -64,6 +62,8 @@ class TaskForm(BootstrapFormMixin, forms.ModelForm):
                 defaults={"color": "#5b8def"},
             )
             task.category = category
+        else:
+            task.category = None
         if commit:
             task.save()
             self.save_m2m()
