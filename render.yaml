@@ -11,9 +11,9 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: taskflow.onrender.com
+        value: todo-app-was7.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://taskflow.onrender.com
+        value: https://todo-app-was7.onrender.com
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: TWILIO_ACCOUNT_SID
